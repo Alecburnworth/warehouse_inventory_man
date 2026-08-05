@@ -223,7 +223,7 @@ export async function fetchOpenTasks(
         tasks.status as status,
         tasks.notes,
         customers.name as customer_name,
-        customers.image_url as image_url,
+        customers.image_url as customer_image_url,
         users.name
       FROM tasks
       JOIN customers ON tasks.customer_id = customers.id

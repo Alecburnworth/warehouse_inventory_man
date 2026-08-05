@@ -31,7 +31,7 @@ export default async function TasksTable({
                   <div>
                     <div className="mb-2 flex items-center">
                       <Image
-                        src={task.image_url}
+                        src={task.customer_image_url}
                         className="mr-2 rounded-full"
                         width={28}
                         height={28}
@@ -72,7 +72,7 @@ export default async function TasksTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <Image
-                        src={task.image_url}
+                        src={task.customer_image_url}
                         className="rounded-full"
                         width={28}
                         height={28}
@@ -111,7 +111,7 @@ export default async function TasksTable({
                   <div>
                     <div className="mb-2 flex items-center">
                       <Image
-                        src={task.image_url}
+                        src={task.customer_image_url}
                         className="mr-2 rounded-full"
                         width={28}
                         height={28}
@@ -152,7 +152,7 @@ export default async function TasksTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <Image
-                        src={task.image_url}
+                        src={task.customer_image_url}
                         className="rounded-full"
                         width={28}
                         height={28}
@@ -191,7 +191,7 @@ export default async function TasksTable({
                     <div>
                       <div className="mb-2 flex items-center">
                         <Image
-                          src={task.image_url}
+                          src={task.customer_image_url}
                           className="mr-2 rounded-full"
                           width={28}
                           height={28}
@@ -232,7 +232,7 @@ export default async function TasksTable({
                     <td className="whitespace-nowrap py-3 pl-6 pr-3">
                       <div className="flex items-center gap-3">
                         <Image
-                          src={task.image_url}
+                          src={task.customer_image_url}
                           className="rounded-full"
                           width={28}
                           height={28}
