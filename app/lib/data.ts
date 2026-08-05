@@ -4,8 +4,12 @@ import {
   CustomersTableType,
   InvoiceForm,
   InvoicesTable,
+  PendingInvoices,
   LatestInvoiceRaw,
   Revenue,
+  Tasks,
+  TaskForm,
+  UsersField,
 } from './definitions';
 import { formatCurrency } from './utils';
 
@@ -116,17 +120,218 @@ export async function fetchFilteredInvoices(
   }
 }
 
+export async function fetchOpenInvoices(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const pendingInvoices = await sql<PendingInvoices[]>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.status,
+        customers.name,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        invoices.status = '' 
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return pendingInvoices;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+
+export async function fetchPendingInvoices(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const pendingInvoices = await sql<PendingInvoices[]>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.status,
+        customers.name,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        invoices.status = 'pending' 
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return pendingInvoices;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+
+export async function fetchPaidInvoices(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const pendingInvoices = await sql<InvoicesTable[]>`
+      SELECT
+        invoices.id,
+        invoices.amount,
+        invoices.status,
+        customers.name,
+        customers.image_url
+      FROM invoices
+      JOIN customers ON invoices.customer_id = customers.id
+      WHERE
+        invoices.status = 'paid'
+      ORDER BY invoices.date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return pendingInvoices;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch invoices.');
+  }
+}
+
+export async function fetchOpenTasks(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const openTasks = await sql<Tasks[]>`
+      SELECT
+        tasks.id,
+        tasks.user_id,
+        tasks.customer_id,
+        tasks.title as title,
+        tasks.status as status,
+        tasks.notes,
+        customers.name as customer_name,
+        customers.image_url as image_url,
+        users.name
+      FROM tasks
+      JOIN customers ON tasks.customer_id = customers.id
+      JOIN users ON tasks.user_id = users.id
+      WHERE
+        tasks.status = 'O'
+      ORDER BY tasks.id DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+    return openTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch open tasks.');
+  }
+}
+
+export async function fetchInProgressTasks(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const inProgressTasks = await sql<Tasks[]>`
+      SELECT
+        tasks.id,
+        tasks.user_id,
+        tasks.customer_id,
+        tasks.title as title,
+        tasks.status as status,
+        tasks.notes,
+        customers.name as customer_name,
+        customers.image_url as image_url,
+        users.name
+      FROM tasks
+      JOIN customers ON tasks.customer_id = customers.id
+      JOIN users ON tasks.user_id = users.id
+      WHERE
+        tasks.status = 'IP'
+      ORDER BY tasks.id DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return inProgressTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch in progress tasks.');
+  }
+}
+
+export async function fetchClosedTasks(
+  query: string,
+  currentPage: number,
+) {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const closedTasks = await sql<Tasks[]>`
+      SELECT
+        tasks.id,
+        tasks.user_id,
+        tasks.customer_id,
+        tasks.title as title,
+        tasks.status as status,
+        tasks.notes,
+        customers.name as customer_name,
+        customers.image_url as image_url,
+        users.name
+      FROM tasks
+      JOIN customers ON tasks.customer_id = customers.id
+      JOIN users ON tasks.user_id = users.id
+      WHERE
+        tasks.status = 'C'
+      ORDER BY tasks.id DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return closedTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch closed tasks.');
+  }
+}
+
+export async function fetchTasksPages(query: string) {
+  try {
+    const data = await sql`SELECT COUNT(*)
+    FROM tasks
+    JOIN customers ON tasks.customer_id = customers.id
+    WHERE
+      tasks.status = 'Open' or tasks.status = 'In Progress' or tasks.status = 'Closed'
+  `;
+
+  const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of tasks.');
+  }
+}
+
 export async function fetchInvoicesPages(query: string) {
   try {
     const data = await sql`SELECT COUNT(*)
     FROM invoices
     JOIN customers ON invoices.customer_id = customers.id
     WHERE
-      customers.name ILIKE ${`%${query}%`} OR
-      customers.email ILIKE ${`%${query}%`} OR
-      invoices.amount::text ILIKE ${`%${query}%`} OR
-      invoices.date::text ILIKE ${`%${query}%`} OR
-      invoices.status ILIKE ${`%${query}%`}
+      invoices.status = 'pending'
   `;
 
     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
@@ -159,6 +364,31 @@ export async function fetchInvoiceById(id: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
+  }
+}
+
+export async function fetchTaskById(id: string) {
+  try {
+    const data = await sql<TaskForm[]>`
+      SELECT
+        tasks.id,
+        tasks.user_id,
+        tasks.customer_id,
+        tasks.title,
+        tasks.status,
+        tasks.notes
+      FROM tasks
+      WHERE tasks.id = ${id};
+    `;
+
+    const task = data.map((task) => ({
+      ...task
+    }));
+
+    return task[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch task.');
   }
 }
 
@@ -228,5 +458,22 @@ export async function fetchFilteredCustomers(query: string) {
   } catch (err) {
     console.error('Database Error:', err);
     throw new Error('Failed to fetch customer table.');
+  }
+}
+
+export async function fetchUsers() {
+  try {
+    const users = await sql<UsersField[]>`
+      SELECT
+        id,
+        name
+      FROM users
+      ORDER BY name ASC
+    `;
+
+    return users;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all users.');
   }
 }
