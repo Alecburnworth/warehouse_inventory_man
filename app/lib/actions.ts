@@ -154,7 +154,7 @@ export type State = {
     }
   
     // Revalidate the cache for the invoices page and redirect the user.
-    revalidatePath('/dashboard');
+    revalidatePath('/login');
     redirect('/login');
   }
 
