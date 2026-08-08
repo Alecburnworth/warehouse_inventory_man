@@ -101,7 +101,16 @@ export type State = {
     message?: string | null;
   };
 
-  export async function createUser(prevState: State, formData: FormData) {
+  export type RegisterState = {
+    errors?: {
+      email?: string[];
+      password?: string[];
+      name?: string[];
+    };
+    message: string;
+  };
+
+  export async function createUser(prevState: RegisterState, formData: FormData) {
     // Validate form using Zod
     const validatedTaskFields = CreateUser.safeParse({
         name: formData.get('name'),

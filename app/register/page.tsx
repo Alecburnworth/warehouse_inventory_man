@@ -10,12 +10,12 @@ import {
   BookOpenIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/app/ui/button';
-import { createUser, State } from '@/app/lib/actions';
+import { createUser, RegisterState } from '@/app/lib/actions';
 import { useActionState } from 'react';
 
 export default function Form() {
 
-  const initialState : State = { message: null, errors: {}};
+  const initialState : RegisterState = { message: '', errors: {}};
   const[state, formAction] = useActionState(createUser, initialState);
 
   return (

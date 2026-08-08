@@ -1,7 +1,7 @@
 import Form from '@/app/ui/tasks/edit-form';
 import Breadcrumbs from '@/app/ui/tasks/breadcrumbs';
 import { fetchTaskById, fetchCustomers, fetchUsers } from '@/app/lib/data';
-import { notFound } from 'next/navigation';
+import { notFound } from 'next/navigation'
  
 export default async function Page(props: { params: Promise<{ id: string }> }) {
     const params = await props.params;
